@@ -3,9 +3,9 @@ const bcrypt = require('bcryptjs')
 
 const db = require('./auth-model')
 
-const {validateBody, validateUsername, hashPassword} = require('./auth-middleware')
+const {validateBody, validateUnique, validateUsername, hashPassword, validatePassword} = require('./auth-middleware')
 
-router.post('/register', validateBody, validateUsername, hashPassword, (req, res) => {
+router.post('/register', validateBody, validateUnique, hashPassword, (req, res) => {
     db.add(res.locals.user)
         .then(resp => {
             res.status(201).json({id: resp[0]})
@@ -16,28 +16,10 @@ router.post('/register', validateBody, validateUsername, hashPassword, (req, res
         })
 })
 
-router.post('/login', validateBody, (req, res) => {
-    const {username, password} = res.locals.user
-
-    db.find({username})
-        .then(user => {
-            if (user) {
-                bcrypt.compare(password, user.password, (err, match) => {
-                    if (err) {
-                        throw err
-                    }
-                    else {
-                        if (match) res.json({message: `Hello ${user.username}`, id: user.id})
-                        else res.status(401).json({message: 'You shall not pass!'})
-                    }
-                })
-            }
-            else res.status(401).json({message: 'You shall not pass!'})
-        })
-        .catch(err => {
-            console.error(err)
-            res.sendStatus(500)
-        })
+router.post('/login', validateBody, validateUsername, validatePassword, (req, res) => {
+    const {username, id} = res.locals.user
+    
+    res.json({message: `Hello ${username}`, id})
 })
 
 module.exports = router

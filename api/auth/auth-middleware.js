@@ -16,7 +16,7 @@ function validateBody(req, res, next) {
     next()
 }
 
-function validateUsername(req, res, next) {
+function validateUnique(req, res, next) {
     const username = res.locals.user.username
     
     db.find({username})
@@ -45,4 +45,37 @@ function hashPassword(req, res, next) {
     })
 }
 
-module.exports = {validateBody, validateUsername, hashPassword}
+function validateUsername(req, res, next) {
+    const username = res.locals.user.username
+
+    db.find({username})
+        .then(user => {
+            if (user) {
+                res.locals.user.hash = user.password
+                res.locals.user.id = user.id
+                next()
+            }
+            else res.status(401).json({message: 'You shall not pass!'})
+        })
+        .catch(err => {
+            console.error(err)
+            res.sendStatus(500)
+        })
+}
+
+function validatePassword(req, res, next) {
+    const {password, hash} = res.locals.user
+
+    bcrypt.compare(password, hash, (err, match) => {
+        if (err) {
+            console.error(err)
+            res.sendStatus(500)
+        }
+        else {
+            if (match) next()
+            else res.status(401).json({message: 'You shall not pass!'})
+        }
+    })
+}
+
+module.exports = {validateBody, validateUnique, validateUsername, hashPassword, validatePassword}
