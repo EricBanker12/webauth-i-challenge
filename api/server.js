@@ -3,6 +3,8 @@ const helmet = require('helmet')
 const cors = require('cors')
 const session = require('express-session')
 
+const SessionStore = require('connect-session-knex')(session)
+
 const authRouter = require('./auth/auth-router')
 const usersRouter = require('./users/users-router')
 
@@ -22,7 +24,11 @@ server.use(session({
     cookie: {
         maxAge: 1000 * 60 * 60 * 18, // 18 hours
         secure: process.env.SECRET ? true : false,
-    }
+    },
+    store: new SessionStore({
+        knex: require('../database/db'),
+        clearInterval: 1000 * 60 * 60 * 2, // 2 hours
+    })
 }))
 
 // routers
