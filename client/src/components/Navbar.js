@@ -1,10 +1,11 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import axios from 'axios'
+
+import {axiosWithCred} from '../utils'
 
 export function Navbar(props) {
     function logout() {
-        axios.delete('http://localhost:4000/api/logout')
+        axiosWithCred.delete('http://localhost:4000/api/logout')
             .then(() => {
                 props.history.push('/')
             })

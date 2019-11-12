@@ -14,7 +14,10 @@ const server = express()
 
 // global middleware
 server.use(helmet())
-server.use(cors())
+server.use(cors({
+    credentials: true,
+    origin: 'http://localhost:3000',
+}))
 server.use(express.json())
 server.use(session({
     name: 'session',

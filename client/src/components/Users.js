@@ -1,13 +1,14 @@
 import React from 'react'
-import axios from 'axios'
+
+import {axiosWithCred} from '../utils'
 
 export function Users(props) {
     const [users, setUsers] = React.useState([])
 
     React.useEffect(() => {
-        axios.get('http://localhost:4000/api/users')
-            .then(users => {
-                setUsers(users)
+        axiosWithCred.get('http://localhost:4000/api/users')
+            .then(resp => {
+                setUsers(resp.data)
             })
             .catch(console.error)
     }, [])

@@ -1,0 +1,1 @@
+export const axiosWithCred = require('axios').create({withCredentials: true})
