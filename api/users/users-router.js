@@ -1,10 +1,9 @@
 const router = require('express').Router()
 
 const db = require('./users-model')
-const {validateHeaders} = require('./users-middleware')
-const {validateUsername, validatePassword} = require('../auth/auth-middleware')
+const {validateSession} = require('./users-middleware')
 
-router.get('/', validateHeaders, validateUsername, validatePassword, (req, res) => {
+router.get('/', validateSession, (req, res) => {
     db.find()
         .then(resp => res.json(resp))
         .catch(err => {

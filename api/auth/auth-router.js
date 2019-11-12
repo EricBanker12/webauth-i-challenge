@@ -1,5 +1,4 @@
 const router = require('express').Router()
-const bcrypt = require('bcryptjs')
 
 const db = require('./auth-model')
 
@@ -7,8 +6,9 @@ const {validateBody, validateUnique, validateUsername, hashPassword, validatePas
 
 router.post('/register', validateBody, validateUnique, hashPassword, (req, res) => {
     db.add(res.locals.user)
-        .then(resp => {
-            res.status(201).json({id: resp[0]})
+        .then(([id]) => {
+            req.session.userId = id
+            res.status(201).json({id})
         })
         .catch(err => {
             console.error(err)
@@ -19,7 +19,13 @@ router.post('/register', validateBody, validateUnique, hashPassword, (req, res) 
 router.post('/login', validateBody, validateUsername, validatePassword, (req, res) => {
     const {username, id} = res.locals.user
     
+    req.session.userId = id
     res.json({message: `Hello ${username}`, id})
+})
+
+router.delete('/logout', (req, res) => {
+    if (req.session) req.session.destroy()
+    res.sendStatus(204)
 })
 
 module.exports = router

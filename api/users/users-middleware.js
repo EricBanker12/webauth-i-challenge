@@ -13,4 +13,9 @@ function validateHeaders(req, res, next) {
     next()
 }
 
-module.exports = {validateHeaders}
+function validateSession(req, res, next) {
+    if (req.session && req.session.userId) next()
+    else res.status(401).json({message: 'Missing valid session'})
+}
+
+module.exports = {validateHeaders, validateSession}
